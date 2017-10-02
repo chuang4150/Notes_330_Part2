@@ -1,0 +1,1 @@
+This file will be moved for practicing use of Python's os module.
