@@ -1,4 +1,3 @@
-import sys
 class NoteContent(object):
 
     """
@@ -10,20 +9,15 @@ class NoteContent(object):
 
     _ids_in_use = set()
 
-    def __init__(self, file_name):
-        self.file_name = file_name
-        self.unique_id = None
+    def __init__(self, unique_id):
+        if unique_id in self._ids_in_use:
+            print("WARNING: duplicate id.")
+        self._ids_in_use.add(unique_id)
+        self.unique_id = unique_id
         self.mentions = set()
         self.topics = set()
         self.references = set()
         self.urls = set()
-
-    def create_id(self, unique_id):
-        self.unique_id = unique_id
-        if unique_id in self._ids_in_use:
-            print("WARNING: duplicate id. Program terminating.")
-            sys.exit(1)
-        self._ids_in_use.add(unique_id)
 
     def add_mentions(self, *items):
         self.mentions.update(items)
@@ -50,10 +44,10 @@ class NoteContent(object):
         self.urls.update(items)
 
     def __eq__(self, other):
-        return self.file_name == other.file_name
+        return self.unique_id == other.unique_id
 
     def __str__(self):
-        return self.file_name
+        return self.unique_id
 
     def __hash__(self):
         return hash(str(self))

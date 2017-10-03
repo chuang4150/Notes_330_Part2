@@ -7,7 +7,7 @@ import unittest
 
 class TestNote(unittest.TestCase):
     
-    test_note = NoteContent("xyz.txt")
+    test_note = NoteContent("xyz")
     
     def test_has_mention(self):
         self.test_note.add_mentions("mention test", "another mention")
@@ -32,8 +32,8 @@ class TestNote(unittest.TestCase):
         self.assertEqual(self.test_note.urls, set(["twitter.com", "luc.edu"]))
 
     def test_eq(self):
-        self.second_test_note = NoteContent("xyz.txt")
-        self.third_test_note = NoteContent("abc.txt")
+        self.second_test_note = NoteContent("xyz")
+        self.third_test_note = NoteContent("abc")
         self.assertEqual(self.test_note, self.second_test_note)
         self.assertNotEqual(self.test_note, self.third_test_note)
 

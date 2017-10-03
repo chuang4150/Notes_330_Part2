@@ -15,12 +15,7 @@ class TestNoteGroup(unittest.TestCase):
         for j in range(1, i+1):
             notes[j].add_mentions(i)
             notes[j].add_topics(i+1)
-    #add ids and references
-    notes[0].create_id("a")
-    notes[2].create_id("c")
-    notes[3].create_id("d")
-    notes[4].create_id("e")
-    notes[5].create_id("f")
+    #add references
     notes[0].add_references("e", "f")
     notes[1].add_references("a")
     notes[2].add_references("d")
@@ -53,7 +48,7 @@ class TestNoteGroup(unittest.TestCase):
 
     def test_topo_sort(self):
         expected_sort = ["b", "a", "f", "e", "c", "d"]
-        ng_topo_sort = list(map(lambda x: x.file_name, self.ng.topo_sort()))
+        ng_topo_sort = list(map(lambda x: x.unique_id, self.ng.topo_sort()))
         self.assertEqual(expected_sort, ng_topo_sort)
         
 
