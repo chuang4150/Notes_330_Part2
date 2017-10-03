@@ -5,12 +5,12 @@ class NoteGroup(object):
 
     """
     This class deals with handling groups of notes and provides
-    useful methods for generating data for the reports. Currently
-    this is identical to Team J's project 1. Changes will be made
-    to reflect new features.
+    useful methods for generating data for the reports. Changes
+    will be made as needed to reflect new features.
     """
 
     def __init__(self, *notes):
+        """create a new NoteGroup from a collection of NoteContent objects"""
         self.notes = list(*notes)
         self.mentions = set()
         self.topics = set()
@@ -19,15 +19,23 @@ class NoteGroup(object):
             self.topics.update(note.topics)
 
     def with_mentions(self):
+        """returns a list of NoteContent objects containing one or more mentions"""
         return list(filter(lambda x: x.mention_count() > 0, self.notes))
 
     def with_mention(self, mention):
+        """returns a list of NoteContent objects containing a specified mention"""
         return list(filter(lambda x: x.has_mention(mention), self.notes))
 
     def with_topic(self, topic):
+        """returns a list of NoteContent objects containing a specified topic"""
         return list(filter(lambda x: x.has_topic(topic), self.notes))
 
     def topo_sort(self):
+        """returns a list of all NoteContent objects in topological order
+
+        implementation of: https://courses.cs.washington.edu/courses/cse326/03wi/lectures/RaoLect20.pdf
+        """
+        
         ids = list(map(lambda x: x.unique_id, self.notes))
         
         in_degree = [0] * len(self.notes)
@@ -44,7 +52,6 @@ class NoteGroup(object):
         in_degree_zero = deque(i for i, x in enumerate(in_degree) if x == 0)
         t_sorted = []
 
-        #https://courses.cs.washington.edu/courses/cse326/03wi/lectures/RaoLect20.pdf
         while(len(in_degree_zero) > 0):
             note_index = in_degree_zero.popleft()
             t_sorted.append(self.notes[note_index])
@@ -54,3 +61,17 @@ class NoteGroup(object):
                     in_degree_zero.append(ids.index(adjacent))
 
         return t_sorted
+
+    def referenced_notes(self, note_content):
+        """returns a list of all NoteContent objects referenced from a specified NoteContent object"""
+        return list(filter(lambda x: x.unique_id in note_content.references, self.notes))
+
+    def with_id(self, unique_id):
+        """reutrn the NoteContent object matching the specified id
+
+        will return None if no note has this id
+        """
+        for note in self.notes:
+            if note.unique_id == unique_id:
+                return note
+        return None
