@@ -71,6 +71,31 @@ class TestNoteGroup(unittest.TestCase):
                          set(self.notes[2:3]))
         self.assertEqual(set(self.ng.referenced_notes(self.notes[5])),
                          {self.ng.with_id("c"), self.ng.with_id("e")})
+        
+    def test_modifying_notes(self):
+        #add
+        noteG = NoteContent("g")
+        noteG.add_mentions("mention")
+        noteG.add_topics("topic")
+        self.ng.add_note(noteG)
+        self.assertEqual(self.ng.with_id("g"), noteG)
+        self.assertEqual(self.ng.mentions, set([1, 2, 3, 4, "mention"]))
+        self.assertEqual(self.ng.topics, set([2, 3, 4, 5, "topic"]))
+
+        #edit
+        noteG = NoteContent("g")
+        noteG.add_mentions("newmention")
+        noteG.add_topics("newtopic")
+        self.ng.edit_note(noteG)
+        self.assertEqual(self.ng.with_id("g"), noteG)
+        self.assertEqual(self.ng.mentions, set([1, 2, 3, 4, "newmention"]))
+        self.assertEqual(self.ng.topics, set([2, 3, 4, 5, "newtopic"]))
+
+        #delete
+        self.ng.delete_note(noteG)
+        self.assertEqual(self.ng.with_id("g"), None)
+        self.assertEqual(self.ng.mentions, set([1, 2, 3, 4]))
+        self.assertEqual(self.ng.topics, set([2, 3, 4, 5]))
 
 if __name__ == '__main__':
     unittest.main()

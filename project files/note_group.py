@@ -10,10 +10,45 @@ class NoteGroup(object):
     """
 
     def __init__(self, *notes):
-        """create a new NoteGroup from a collection of NoteContent objects"""
+        """create a new NoteGroup from a collection of NoteContent objects
+        
+        A NoteGroup object can handle the addition, deletion, and
+        modification of notes that may occur after initialization.
+        """
         self.notes = list(*notes)
         self.mentions = set()
         self.topics = set()
+        for note in self.notes:
+            self.mentions.update(note.mentions)
+            self.topics.update(note.topics)
+
+    def add_note(self, note):
+        """add a note to an existing NoteGroup
+        
+        useful for when a new note is created after initializing a NoteGroup
+        """
+        self.notes.append(note)
+        self.mentions.update(note.mentions)
+        self.topics.update(note.topics)
+
+    def delete_note(self, note):
+        """delete a note from an existing NoteGroup
+
+        useful for when a note is deleted after initializing a NoteGroup
+        """
+        self.notes.remove(note)
+        self.mentions.clear()
+        self.topics.clear()
+        for note in self.notes:
+            self.mentions.update(note.mentions)
+            self.topics.update(note.topics)
+
+    def edit_note(self, note):
+        """should be called on a NoteGroup immediately after a note is edited"""
+        self.notes.remove(note)
+        self.notes.append(note) #note still has same identity, but may have different information
+        self.mentions.clear()
+        self.topics.clear()
         for note in self.notes:
             self.mentions.update(note.mentions)
             self.topics.update(note.topics)

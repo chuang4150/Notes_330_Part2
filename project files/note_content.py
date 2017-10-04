@@ -6,13 +6,8 @@ class NoteContent(object):
     to reflect new features.
     """
 
-    _ids_in_use = set()
-
     def __init__(self, unique_id):
         """create a new NoteContent object using a note's unique_id"""
-        if unique_id in self._ids_in_use:
-            print("WARNING: duplicate id.")
-        self._ids_in_use.add(unique_id)
         self.unique_id = unique_id
         self.mentions = set()
         self.topics = set()
