@@ -45,13 +45,8 @@ class NoteGroup(object):
 
     def edit_note(self, note):
         """should be called on a NoteGroup immediately after a note is edited"""
-        self.notes.remove(note)
-        self.notes.append(note) #note still has same identity, but may have different information
-        self.mentions.clear()
-        self.topics.clear()
-        for note in self.notes:
-            self.mentions.update(note.mentions)
-            self.topics.update(note.topics)
+        self.delete_note(note) #note still has same identity, but may have different information
+        self.add_note(note)
 
     def with_mentions(self):
         """returns a list of NoteContent objects containing one or more mentions"""
