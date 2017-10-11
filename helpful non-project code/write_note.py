@@ -33,10 +33,11 @@ def reading():
     def read_note (note):
         filename = cwd + note_directory_name + note + '.pickle'
         with open (filename, 'rb') as f:
-            return (pickle.load(f))
-
+            x = (pickle.load(f))
+            y = 'Body of note titled:' + (x.title) + "\n" + (x.body)
+            print (y)
     (read_note(reading_notes))
-    
+
 
 print("Welcome to our note taking system")
 
@@ -45,3 +46,4 @@ if right == 'write':
     writing()
 elif right == 'read':
     reading()
+
