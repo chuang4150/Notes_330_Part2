@@ -2,7 +2,7 @@
  Our note-taking project has the ability to report notes that has mentions, can organize all notes with respect to mentions and keywords. The system can report the notes by keywords and mentions selectively. It can also the notes in topological order. The current version of the project has five updated features:
   ## Features of NoteTaking System:
      #1- Create and Save new notes:	
-		 			User will be able to create new file by selecting the apprpriate option. Once the note is created, user will be able to save it in a particular folder. Note will be saved by providing them a desired "topic". 
+	      User will be able to create new file by selecting the apprpriate option. Once the note is created, user will be able to save it in a particular folder. Note will be saved by providing them a desired "topic". 
             
      #2- Edit and view existing notes, including deleting of notes:
           By selecting the appropraite option for the prompt. User will be able to edit the existing note.User will also be able to view the particular note or a list of existing notes in a folder.         
