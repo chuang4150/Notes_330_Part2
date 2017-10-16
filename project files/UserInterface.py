@@ -95,7 +95,7 @@ class UserInterface:
             f.write('\n' + change)
             f.close()
             print("\nNote Saved")
-            #compilation.edit_note(create_note_content(fileName, this currently poses an issue...
+            compilation.edit_note(NoteContent(fileName, compilation.with_id(fileName).body + " " + change))
         #delete note
         elif userCommand.lower().startswith("d"):
             delete_note = input ("Enter the title of the note you would like to remove: ")
