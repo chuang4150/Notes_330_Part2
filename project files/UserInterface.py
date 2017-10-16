@@ -16,17 +16,19 @@ class UserInterface:
             while searching:
                 searching = False
                 searchCommand = input("Please enter something to search for: ")
-                if searchCommand.startswith("@"):
+                if searchCommand.startswith("m"):
                     print("This searches for mentions")
-                elif userCommand.startswith("#"):
+                elif userCommand.startswith("t"):
                     print("This searches for topic")
-                elif searchCommand.startswith("^"):
+                elif searchCommand.startswith("r"):
                     print("This searches for references")
                 elif userCommand.lower().startswith("q"):
                     quit()
                 else:
                     print("Please enter a valid search")
                     searching = True
+        elif userCommand.lower().startswith("t"):
+            print("This will be where topological sort goes")
         elif userCommand.lower().startswith("c"):
             print("This will be where code goes to create files")
         elif userCommand.lower().startswith("e"):
