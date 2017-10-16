@@ -66,6 +66,8 @@ for fileName in files:
 
     compilation=NoteGroup(notes)
 
+    #TODO: view body of a note, include option to view references
+
     running = True
     while running:
         userCommand = input("Please enter a command: ")
@@ -80,21 +82,38 @@ for fileName in files:
                 elif searchCommand.startswith("t"):
                     topic = input("Enter topic to search for: ")
                     for note in compilation.with_topic(topic): print(note)
-                elif searchCommand.startswith("r"):
-                    print("This searches for references")
                 elif searchCommand.lower().startswith("q"):
                     quit()
                 else:
                     print("Please enter a valid search")
                     searching = True
         elif userCommand.lower().startswith("t"):
-            print("This will be where topological sort goes")
+            for note in compilation.topo_sort(): print(note)
         elif userCommand.lower().startswith("c"):
-            print("This will be where code goes to create files")
+            save_path = os.path.join(os.path.expanduser('~'),'Documents')
+            name_of_file = input("What is the name of the note: ")
+            completeName = os.path.join(save_path, name_of_file+".txt")
+            file1 = open(completeName, "w")
+            toFile = input("Beginning of your note: ")
+            file1.write(toFile)
+            file1.close()
+            #compilation.add_note
         elif userCommand.lower().startswith("e"):
-            print("This will be where code goes to edit files")
+            save_path = os.path.join(os.path.expanduser('~'),'Documents')
+            files=get_file_names()
+            print("Current saved notes:", files)
+            fileName = input("What is the name of the note you would like to edit?")
+            f = open(save_path + '/' + fileName + '.txt','a')
+            change = input("Add your changes:")
+            f.write('\n' + change)
+            f.close()
+            #compilation.edit_note
         elif userCommand.lower().startswith("d"):
-            print("This will be where the code goes to delete files")
+            delete_note = input ("Enter the title of the note you would like to remove: ")
+            dn = '/' + delete_note + '.txt'
+            note_directory_name = os.path.join(os.path.expanduser('~'),'Documents')
+            os.remove(note_directory_name + dn)
+            #compilation.delete_note
         elif userCommand.lower().startswith("q"):
             quit()
         else:
