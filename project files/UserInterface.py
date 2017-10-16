@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-import glob
-import os.path
 from note_content import NoteContent
 from note_group import NoteGroup
 
@@ -12,29 +10,26 @@ class UserInterface:
     by mentions and topics. The program can be quit at any time.
     '''
     save_path = os.path.join(os.getcwd(),'note_library')
-    
-    def get_file_names(directory): #lists all text files in a directory
-        os.chdir(directory)
-        list_of_files = glob.glob('*.txt')
-        return (list_of_files)
 
-    files=get_file_names(save_path) #will need to walk through all folders
-    
     notes=[]
-    for fileName in files:
-        file = open(fileName,"r" )
-        read_file = file.read()
-        file.close()
-        notes.append(NoteContent(fileName[:-4], read_file))
+    folders = []
+    for root, dirs, files in os.walk(save_path, topdown = False):
+        for name in files:
+            if name.endswith(".txt"):
+                note = open(os.path.join(root, name), "r")
+                body = note.read()
+                note.close()
+                notes.append(NoteContent(name[:-4], body))
+        for name in dirs:
+            folders.append(name)
 
     compilation=NoteGroup(notes)
-
-    #TODO: add support for folder organization
 
     running = True
     while running:
         userCommand = input("\ns: search\n"
                             "t: topological sort\n"
+                            "n: navigate files\n"
                             "v: view note\n"
                             "c: create note\n"
                             "e: edit note\n"
@@ -66,6 +61,13 @@ class UserInterface:
             print("\nResults:")
             for note in compilation.topo_sort(): print(note)
 
+        #navigation
+        elif userCommand.lower().startswith("n"):
+            print("Available folders:")
+            for folder in folders: print(folder)
+            folder = input("\nEnter folder name: ")
+            print("Will allow user to navigate files and view notes")
+
         #view note
         #add support for navigating folders
         #add support for references
@@ -78,6 +80,7 @@ class UserInterface:
 
         #create note
         elif userCommand.lower().startswith("c"):
+            note_folder = "default"
             name_of_file = ""
             not_valid = name_of_file == "" or name_of_file in compilation.ids()
             while not_valid:
@@ -85,7 +88,7 @@ class UserInterface:
                 not_valid = name_of_file == "" or name_of_file in compilation.ids()
                 if not_valid:
                     print("Please enter a unique name for this note")
-            completeName = os.path.join(save_path, name_of_file+".txt")
+            completeName = os.path.join(save_path, note_folder, name_of_file+".txt")
             file1 = open(completeName, "w")
             toFile = input("Beginning of your note: ")
             file1.write(toFile)
@@ -95,10 +98,11 @@ class UserInterface:
 
         #edit note
         elif userCommand.lower().startswith("e"):
-            files=get_file_names(save_path)
+            note_folder = "default"
+            files=compilation.ids()
             print("Current saved notes:", files)
             fileName = input("What is the name of the note you would like to edit?")
-            f = open(save_path + '/' + fileName + '.txt','a')
+            f = open(os.path.join(save_path, note_folder, fileName) + '.txt', 'a')
             change = input("Add your changes:")
             f.write('\n' + change)
             f.close()
@@ -106,9 +110,9 @@ class UserInterface:
             compilation.edit_note(NoteContent(fileName, compilation.with_id(fileName).body + " " + change))
         #delete note
         elif userCommand.lower().startswith("d"):
+            note_folder = "default"
             delete_note = input ("Enter the title of the note you would like to remove: ")
-            dn = '/' + delete_note + '.txt'
-            os.remove(save_path + dn)
+            os.remove(os.path.join(save_path, note_folder, delete_note + ".txt"))
             print("\nNote Deleted")
             compilation.delete_note(compilation.with_id(delete_note))
 
