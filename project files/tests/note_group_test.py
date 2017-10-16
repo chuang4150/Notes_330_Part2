@@ -7,20 +7,12 @@ from note_content import NoteContent
 import unittest
 
 class TestNoteGroup(unittest.TestCase):
-    notes = (NoteContent("a"), NoteContent("b"), NoteContent("c"), NoteContent("d"), NoteContent("e"), NoteContent("f"))
-    #add topics and mentions to notes b - e
-    #note b has topics 2 - 5, c has 3 - 5 ... e just has 5
-    #note b has mentions 1 - 4, c has 2 - 4 ... e just has 4
-    for i in range(0, len(notes) - 1):
-        for j in range(1, i+1):
-            notes[j].add_mentions(i)
-            notes[j].add_topics(i+1)
-    #add references
-    notes[0].add_references("e", "f")
-    notes[1].add_references("a")
-    notes[2].add_references("d")
-    notes[4].add_references("c")
-    notes[5].add_references("c", "e")
+    notes = (NoteContent("a", "^e ^f"),
+             NoteContent("b", "#2 #3 #4 #5 @1 @2 @3 @4 ^a"),
+             NoteContent("c", "#3 #4 #5 @2 @3 @4 ^d"),
+             NoteContent("d", "#4 #5 @3 @4"),
+             NoteContent("e", "#5 @4 ^c"),
+             NoteContent("f", "^c ^e"))
     ng = NoteGroup(notes)
 
     #tests use set to verify that all elements are the same, order does not matter
@@ -37,22 +29,22 @@ class TestNoteGroup(unittest.TestCase):
         self.assertEqual(set(self.ng.with_mentions()), set(self.notes[1:5]))
 
     def test_with_mention(self):
-        self.assertEqual(set(self.ng.with_mention(4)), set(self.notes[1:5]))
-        self.assertEqual(set(self.ng.with_mention(3)), set(self.notes[1:4]))
-        self.assertEqual(set(self.ng.with_mention(2)), set(self.notes[1:3]))
-        self.assertEqual(set(self.ng.with_mention(1)), set(self.notes[1:2]))
+        self.assertEqual(set(self.ng.with_mention("4")), set(self.notes[1:5]))
+        self.assertEqual(set(self.ng.with_mention("3")), set(self.notes[1:4]))
+        self.assertEqual(set(self.ng.with_mention("2")), set(self.notes[1:3]))
+        self.assertEqual(set(self.ng.with_mention("1")), set(self.notes[1:2]))
 
     def test_with_topic(self):
-        self.assertEqual(set(self.ng.with_topic(5)), set(self.notes[1:5]))
-        self.assertEqual(set(self.ng.with_topic(4)), set(self.notes[1:4]))
-        self.assertEqual(set(self.ng.with_topic(3)), set(self.notes[1:3]))
-        self.assertEqual(set(self.ng.with_topic(2)), set(self.notes[1:2]))
+        self.assertEqual(set(self.ng.with_topic("5")), set(self.notes[1:5]))
+        self.assertEqual(set(self.ng.with_topic("4")), set(self.notes[1:4]))
+        self.assertEqual(set(self.ng.with_topic("3")), set(self.notes[1:3]))
+        self.assertEqual(set(self.ng.with_topic("2")), set(self.notes[1:2]))
 
     def test_mentions(self):
-        self.assertEqual(self.ng.mentions, set([1, 2, 3, 4]))
+        self.assertEqual(self.ng.mentions, {"1", "2", "3", "4"})
 
     def test_topics(self):
-        self.assertEqual(self.ng.topics, set([2, 3, 4, 5]))
+        self.assertEqual(self.ng.topics, {"2", "3", "4", "5"})
 
     def test_topo_sort(self):
         expected_sort = ["b", "a", "f", "e", "c", "d"]
@@ -74,28 +66,24 @@ class TestNoteGroup(unittest.TestCase):
         
     def test_modifying_notes(self):
         #add
-        noteG = NoteContent("g")
-        noteG.add_mentions("mention")
-        noteG.add_topics("topic")
+        noteG = NoteContent("g", "@mention #topic")
         self.ng.add_note(noteG)
         self.assertEqual(self.ng.with_id("g"), noteG)
-        self.assertEqual(self.ng.mentions, set([1, 2, 3, 4, "mention"]))
-        self.assertEqual(self.ng.topics, set([2, 3, 4, 5, "topic"]))
+        self.assertEqual(self.ng.mentions, {"1", "2", "3", "4", "mention"})
+        self.assertEqual(self.ng.topics, {"2", "3", "4", "5", "topic"})
 
         #edit
-        noteG = NoteContent("g")
-        noteG.add_mentions("newmention")
-        noteG.add_topics("newtopic")
+        noteG = NoteContent("g", "@newmention #newtopic")
         self.ng.edit_note(noteG)
         self.assertEqual(self.ng.with_id("g"), noteG)
-        self.assertEqual(self.ng.mentions, set([1, 2, 3, 4, "newmention"]))
-        self.assertEqual(self.ng.topics, set([2, 3, 4, 5, "newtopic"]))
+        self.assertEqual(self.ng.mentions, {"1", "2", "3", "4", "newmention"})
+        self.assertEqual(self.ng.topics, {"2", "3", "4", "5", "newtopic"})
 
         #delete
         self.ng.delete_note(noteG)
         self.assertEqual(self.ng.with_id("g"), None)
-        self.assertEqual(self.ng.mentions, set([1, 2, 3, 4]))
-        self.assertEqual(self.ng.topics, set([2, 3, 4, 5]))
+        self.assertEqual(self.ng.mentions, {"1", "2", "3", "4"})
+        self.assertEqual(self.ng.topics, {"2", "3", "4", "5"})
 
     def test_ids(self):
         self.assertEqual({"a", "b", "c", "d", "e", "f"}, set(self.ng.ids()))

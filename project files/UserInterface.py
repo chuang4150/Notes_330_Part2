@@ -21,7 +21,7 @@ class UserInterface:
         return (list_of_files)
 
     files=get_file_names(save_path) #will need to walk through all folders
-
+    """
     def create_note_content(name, body):
 
         def find_identifiers(symbol):
@@ -34,9 +34,7 @@ class UserInterface:
         def find_urls():
             return re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', body)
 
-        
-        note = NoteContent(name)
-        #searched_note = find(body = body, author = "", title = name + '.note')
+        note = NoteContent(name, body)
         mentions=find_identifiers('@')
         topics=find_identifiers('#')
         references=find_identifiers('^')
@@ -48,13 +46,14 @@ class UserInterface:
         note.add_urls(*urls)
 
         return note
+    """
     
     notes=[]
     for fileName in files:
         file = open(fileName,"r" )
         read_file = file.read()
         file.close()
-        notes.append(create_note_content(fileName[:-4], read_file))
+        notes.append(NoteContent(fileName[:-4], read_file))
 
     compilation=NoteGroup(notes)
 

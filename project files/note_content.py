@@ -1,3 +1,5 @@
+import re
+
 class NoteContent(object):
 
     """
@@ -6,17 +8,24 @@ class NoteContent(object):
     to reflect new features.
     """
 
-    def __init__(self, unique_id):
-        """create a new NoteContent object using a note's unique_id"""
+    def __init__(self, unique_id, body):
+        """create a new NoteContent object using a note's unique_id and body
+        
+        processes body of a note and stores mentions, topics, and references
+        in sets for efficient lookup
+        """
         self.unique_id = unique_id
-        self.mentions = set()
-        self.topics = set()
-        self.references = set()
-        self.urls = set()
+        self.body = body
+        self.mentions = set(e[1:] for e in self.__find_identifiers__("@"))
+        self.topics = set(e[1:] for e in self.__find_identifiers__("#"))
+        self.references = set(e[1:] for e in self.__find_identifiers__("^"))
 
-    def add_mentions(self, *items):
-        """add a collection of mentions to this NoteContent"""
-        self.mentions.update(items)
+    def __find_identifiers__(self, symbol):
+        if(symbol!="^"):
+            pattern = r'[' + symbol + ']\S*'
+        else:
+            pattern= r'[' '\^' + ']\S*'
+        return re.findall(pattern, self.body)
 
     def has_mention(self, item):
         """returns boolean for presence of a specified mention"""
@@ -26,25 +35,13 @@ class NoteContent(object):
         """returns number of mentions"""
         return len(self.mentions)
 
-    def add_topics(self, *items):
-        """add a collection of topics to this NoteContent"""
-        self.topics.update(items)
-
     def has_topic(self, item):
         """returns boolean for presence of a specified topic"""
         return item in self.topics
 
-    def add_references(self, *ref_id):
-        """add a collection of references to this NoteContent"""
-        self.references.update(ref_id)
-
     def has_reference(self, ref_id):
         """returns boolean for presence of a specified reference"""
         return ref_id in self.references
-
-    def add_urls(self, *items):
-        """add a collection of urls to this NoteContent"""
-        self.urls.update(items)
 
     def __eq__(self, other):
         return self.unique_id == other.unique_id
