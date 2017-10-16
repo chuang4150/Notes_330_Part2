@@ -18,11 +18,11 @@ class UserInterface:
                 searchCommand = input("Please enter something to search for: ")
                 if searchCommand.startswith("m"):
                     print("This searches for mentions")
-                elif userCommand.startswith("t"):
+                elif searchCommand.startswith("t"):
                     print("This searches for topic")
                 elif searchCommand.startswith("r"):
                     print("This searches for references")
-                elif userCommand.lower().startswith("q"):
+                elif searchCommand.lower().startswith("q"):
                     quit()
                 else:
                     print("Please enter a valid search")
