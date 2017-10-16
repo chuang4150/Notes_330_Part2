@@ -30,13 +30,14 @@ class UserInterface:
     return to the initial menu. The program can be quit at any
     time.
     '''
-    def get_file_names(): #lists all text files in a directory
-        save_path = os.path.join(os.path.expanduser('~'),'Documents')
-        os.chdir(save_path)
+    save_path = os.path.join(os.getcwd(),'note_library')
+    
+    def get_file_names(directory): #lists all text files in a directory
+        os.chdir(directory)
         list_of_files = glob.glob('*.txt')
         return (list_of_files)
 
-    files=get_file_names()
+    files=get_file_names(save_path)
 
 
     notes=[]
@@ -44,7 +45,7 @@ class UserInterface:
         file = open(fileName,"r" )
         read_file = file.read()
         file.close()
-        note = NoteContent(fileName)
+        note = NoteContent(fileName[:-4]) #unique_id of a note is its title (strip '.txt')
         searched_note = find( body = read_file
                          ,author = ""
                          ,title = fileName + '.note')
@@ -95,7 +96,6 @@ class UserInterface:
             print("\nResults:")
             for note in compilation.topo_sort(): print(note)
         elif userCommand.lower().startswith("c"):
-            save_path = os.path.join(os.path.expanduser('~'),'Documents')
             name_of_file = input("What is the name of the note: ")
             completeName = os.path.join(save_path, name_of_file+".txt")
             file1 = open(completeName, "w")
@@ -105,8 +105,7 @@ class UserInterface:
             print("\nNote Created")
             #compilation.add_note
         elif userCommand.lower().startswith("e"):
-            save_path = os.path.join(os.path.expanduser('~'),'Documents')
-            files=get_file_names()
+            files=get_file_names(save_path)
             print("Current saved notes:", files)
             fileName = input("What is the name of the note you would like to edit?")
             f = open(save_path + '/' + fileName + '.txt','a')
@@ -118,8 +117,7 @@ class UserInterface:
         elif userCommand.lower().startswith("d"):
             delete_note = input ("Enter the title of the note you would like to remove: ")
             dn = '/' + delete_note + '.txt'
-            note_directory_name = os.path.join(os.path.expanduser('~'),'Documents')
-            os.remove(note_directory_name + dn)
+            os.remove(save_path + dn)
             print("\nNote Deleted")
             #compilation.delete_note
         elif userCommand.lower().startswith("q"):
