@@ -10,38 +10,29 @@ class UserInterface:
     
     running = True
     while running:
-        userCommand = input("Please enter a command")
-        if userCommand.lower().startswith("s"):    
+        userCommand = input("Please enter a command: ")
+        if userCommand.lower().startswith("s"):
             searching = True
-            searchCommand = input("Please enter something to search for")
             while searching:
+                searching = False
+                searchCommand = input("Please enter something to search for: ")
                 if searchCommand.startswith("@"):
                     print("This searches for mentions")
                 elif userCommand.startswith("#"):
                     print("This searches for topic")
                 elif searchCommand.startswith("^"):
                     print("This searches for references")
-                elif searchCommand.lower().startswith("r"):
-                    searching = False
                 elif userCommand.lower().startswith("q"):
                     quit()
                 else:
                     print("Please enter a valid search")
+                    searching = True
         elif userCommand.lower().startswith("c"):
-            creating = True
-            while creating:
-                print("This will be where code goes to create files")
-                creating = False
+            print("This will be where code goes to create files")
         elif userCommand.lower().startswith("e"):
-            editing = True
-            while editing:
-                print("This will be where code goes to edit files")
-                editing = False
+            print("This will be where code goes to edit files")
         elif userCommand.lower().startswith("d"):
-            deleting = True
-            while deleting:
-                print("This will be where the code goes to delete files")
-                deleting = False
+            print("This will be where the code goes to delete files")
         elif userCommand.lower().startswith("q"):
             quit()   
         else:
