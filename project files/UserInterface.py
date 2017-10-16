@@ -21,32 +21,6 @@ class UserInterface:
         return (list_of_files)
 
     files=get_file_names(save_path) #will need to walk through all folders
-    """
-    def create_note_content(name, body):
-
-        def find_identifiers(symbol):
-            if(symbol!="^"):
-                pattern = r'[' + symbol + ']\S*'
-            else:
-                pattern= r'[' '\^' + ']\S*'
-            return re.findall(pattern, body)
-
-        def find_urls():
-            return re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', body)
-
-        note = NoteContent(name, body)
-        mentions=find_identifiers('@')
-        topics=find_identifiers('#')
-        references=find_identifiers('^')
-        urls = find_urls()
-
-        note.add_mentions(*[e[1:] for e in mentions])
-        note.add_topics(*[e[1:] for e in topics])
-        note.add_references(*[e[1:] for e in references])
-        note.add_urls(*urls)
-
-        return note
-    """
     
     notes=[]
     for fileName in files:
@@ -109,7 +83,7 @@ class UserInterface:
             file1.write(toFile)
             file1.close()
             print("\nNote Created")
-            compilation.add_note(create_note_content(name_of_file, toFile))
+            compilation.add_note(NoteContent(name_of_file, toFile))
 
         #edit note
         elif userCommand.lower().startswith("e"):
