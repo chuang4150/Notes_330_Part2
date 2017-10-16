@@ -3,8 +3,8 @@ import os
 import re
 import glob
 import os.path
-from note_contents import Note
-from Note_group import NoteGroup
+from note_content import NoteContent
+from note_group import NoteGroup
 
 class find(object):
     def __init__ (self, body, author, title):
@@ -45,7 +45,7 @@ for fileName in files:
     file = open(fileName,"r" )
     read_file = file.read()
     file.close()
-    notes.append(Note(fileName))
+    notes.append(NoteContent(fileName))
     searched_note = find( body = read_file
                          ,author = ""
                          ,title = fileName + '.note')
