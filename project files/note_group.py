@@ -105,3 +105,6 @@ class NoteGroup(object):
             if note.unique_id == unique_id:
                 return note
         return None
+
+    def ids(self):
+        return list(map(lambda x: x.unique_id, self.notes))

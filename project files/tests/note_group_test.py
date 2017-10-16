@@ -97,5 +97,8 @@ class TestNoteGroup(unittest.TestCase):
         self.assertEqual(self.ng.mentions, set([1, 2, 3, 4]))
         self.assertEqual(self.ng.topics, set([2, 3, 4, 5]))
 
+    def test_ids(self):
+        self.assertEqual({"a", "b", "c", "d", "e", "f"}, set(self.ng.ids()))
+
 if __name__ == '__main__':
     unittest.main()

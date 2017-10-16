@@ -6,28 +6,11 @@ import os.path
 from note_content import NoteContent
 from note_group import NoteGroup
 
-class find(object):
-    def __init__ (self, body, author, title):
-        self.body = body
-        self.author = author
-        self.title = title
-
-    def find_identifiers(self, symbol):
-        if(symbol!="^"):
-            pattern = r'[' + symbol + ']\S*'
-        else:
-            pattern= r'[' '\^' + ']\S*'
-        return re.findall(pattern, self.body)
-
-    def find_urls(self):
-        return re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', self.body)
-
 class UserInterface:
     '''
     The user can enter a command, either search, create, edit,
     delete, or quit. If they are searching, they can search by
-    mentions (@), topics(#), or references(^). They may also
-    return to the initial menu. The program can be quit at any
+    mentions and topics. The program can be quit at any
     time.
     '''
     save_path = os.path.join(os.getcwd(),'note_library')
@@ -37,15 +20,27 @@ class UserInterface:
         list_of_files = glob.glob('*.txt')
         return (list_of_files)
 
-    files=get_file_names(save_path)
+    files=get_file_names(save_path) #will need to walk through all folders
 
     def create_note_content(name, body):
+
+        def find_identifiers(symbol):
+            if(symbol!="^"):
+                pattern = r'[' + symbol + ']\S*'
+            else:
+                pattern= r'[' '\^' + ']\S*'
+            return re.findall(pattern, body)
+
+        def find_urls():
+            return re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', body)
+
+        
         note = NoteContent(name)
-        searched_note = find(body = body, author = "", title = name + '.note')
-        mentions=find.find_identifiers(searched_note, '@')
-        topics=find.find_identifiers(searched_note, '#')
-        references=find.find_identifiers(searched_note,'^')
-        urls=find.find_urls(searched_note)
+        #searched_note = find(body = body, author = "", title = name + '.note')
+        mentions=find_identifiers('@')
+        topics=find_identifiers('#')
+        references=find_identifiers('^')
+        urls = find_urls()
 
         note.add_mentions(*[e[1:] for e in mentions])
         note.add_topics(*[e[1:] for e in topics])
@@ -53,19 +48,18 @@ class UserInterface:
         note.add_urls(*urls)
 
         return note
-        
-
+    
     notes=[]
     for fileName in files:
         file = open(fileName,"r" )
         read_file = file.read()
         file.close()
-
         notes.append(create_note_content(fileName[:-4], read_file))
 
     compilation=NoteGroup(notes)
 
     #TODO: view body of a note, include option to view references
+    #TODO: organize into folders
 
     running = True
     while running:
@@ -76,6 +70,7 @@ class UserInterface:
                             "d: delete note\n"
                             "q: quit program\n"
                             "Please enter a command: ")
+        #searching
         if userCommand.lower().startswith("s"):
             searching = True
             while searching:
@@ -90,15 +85,25 @@ class UserInterface:
                     print("\nResults:")
                     for note in compilation.with_topic(topic): print(note)
                 elif searchCommand.lower().startswith("q"):
-                    quit()
+                    running = False
                 else:
                     print("Please enter a valid search")
                     searching = True
+                    
+        #topological sort
         elif userCommand.lower().startswith("t"):
             print("\nResults:")
             for note in compilation.topo_sort(): print(note)
+
+        #create note
         elif userCommand.lower().startswith("c"):
-            name_of_file = input("What is the name of the note: ")
+            name_of_file = ""
+            not_valid = name_of_file == "" or name_of_file in compilation.ids()
+            while not_valid:
+                name_of_file = input("What is the name of the note: ")
+                not_valid = name_of_file == "" or name_of_file in compilation.ids()
+                if not_valid:
+                    print("Please enter a unique name for this note")
             completeName = os.path.join(save_path, name_of_file+".txt")
             file1 = open(completeName, "w")
             toFile = input("Beginning of your note: ")
@@ -106,6 +111,8 @@ class UserInterface:
             file1.close()
             print("\nNote Created")
             compilation.add_note(create_note_content(name_of_file, toFile))
+
+        #edit note
         elif userCommand.lower().startswith("e"):
             files=get_file_names(save_path)
             print("Current saved notes:", files)
@@ -116,13 +123,17 @@ class UserInterface:
             f.close()
             print("\nNote Saved")
             #compilation.edit_note(create_note_content(fileName, this currently poses an issue...
+        #delete note
         elif userCommand.lower().startswith("d"):
             delete_note = input ("Enter the title of the note you would like to remove: ")
             dn = '/' + delete_note + '.txt'
             os.remove(save_path + dn)
             print("\nNote Deleted")
             compilation.delete_note(compilation.with_id(delete_note))
+
+        #quit
         elif userCommand.lower().startswith("q"):
-            quit()
+            running = False
         else:
             print("Please enter a valid command")
+    quit()
