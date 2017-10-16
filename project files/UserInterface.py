@@ -39,16 +39,9 @@ class UserInterface:
 
     files=get_file_names(save_path)
 
-
-    notes=[]
-    for fileName in files:
-        file = open(fileName,"r" )
-        read_file = file.read()
-        file.close()
-        note = NoteContent(fileName[:-4]) #unique_id of a note is its title (strip '.txt')
-        searched_note = find( body = read_file
-                         ,author = ""
-                         ,title = fileName + '.note')
+    def create_note_content(name, body):
+        note = NoteContent(name)
+        searched_note = find(body = body, author = "", title = name + '.note')
         mentions=find.find_identifiers(searched_note, '@')
         topics=find.find_identifiers(searched_note, '#')
         references=find.find_identifiers(searched_note,'^')
@@ -59,7 +52,16 @@ class UserInterface:
         note.add_references(*[e[1:] for e in references])
         note.add_urls(*urls)
 
-        notes.append(note)
+        return note
+        
+
+    notes=[]
+    for fileName in files:
+        file = open(fileName,"r" )
+        read_file = file.read()
+        file.close()
+
+        notes.append(create_note_content(fileName[:-4], read_file))
 
     compilation=NoteGroup(notes)
 
