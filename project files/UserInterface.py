@@ -105,7 +105,7 @@ class UserInterface:
             file1.write(toFile)
             file1.close()
             print("\nNote Created")
-            #compilation.add_note
+            compilation.add_note(create_note_content(name_of_file, toFile))
         elif userCommand.lower().startswith("e"):
             files=get_file_names(save_path)
             print("Current saved notes:", files)
@@ -115,13 +115,13 @@ class UserInterface:
             f.write('\n' + change)
             f.close()
             print("\nNote Saved")
-            #compilation.edit_note
+            #compilation.edit_note(create_note_content(fileName, this currently poses an issue...
         elif userCommand.lower().startswith("d"):
             delete_note = input ("Enter the title of the note you would like to remove: ")
             dn = '/' + delete_note + '.txt'
             os.remove(save_path + dn)
             print("\nNote Deleted")
-            #compilation.delete_note
+            compilation.delete_note(compilation.with_id(delete_note))
         elif userCommand.lower().startswith("q"):
             quit()
         else:
