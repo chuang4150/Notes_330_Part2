@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-import re
 import glob
 import os.path
 from note_content import NoteContent
