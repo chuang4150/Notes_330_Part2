@@ -9,9 +9,8 @@ from note_group import NoteGroup
 class UserInterface:
     '''
     The user can enter a command, either search, create, edit,
-    delete, or quit. If they are searching, they can search by
-    mentions and topics. The program can be quit at any
-    time.
+    delete, view, or quit. If they are searching, they can search
+    by mentions and topics. The program can be quit at any time.
     '''
     save_path = os.path.join(os.getcwd(),'note_library')
     
@@ -31,13 +30,13 @@ class UserInterface:
 
     compilation=NoteGroup(notes)
 
-    #TODO: view body of a note, include option to view references
-    #TODO: organize into folders
+    #TODO: add support for folder organization
 
     running = True
     while running:
         userCommand = input("\ns: search\n"
                             "t: topological sort\n"
+                            "v: view note\n"
                             "c: create note\n"
                             "e: edit note\n"
                             "d: delete note\n"
@@ -67,6 +66,16 @@ class UserInterface:
         elif userCommand.lower().startswith("t"):
             print("\nResults:")
             for note in compilation.topo_sort(): print(note)
+
+        #view note
+        #add support for navigating folders
+        #add support for references
+        elif userCommand.lower().startswith("v"):
+            note = input("Enter name of note to view: ")
+            if compilation.with_id(note):
+                print("\nBody:")
+                print(compilation.with_id(note).body)
+            else: print("\nNote does not exist")
 
         #create note
         elif userCommand.lower().startswith("c"):
