@@ -64,6 +64,8 @@ for fileName in files:
     notes[len(notes)-1].add_references(*[e[1:] for e in references])
     notes[len(notes)-1].add_urls(*urls)
 
+    compilation=NoteGroup(notes)
+
     running = True
     while running:
         userCommand = input("Please enter a command: ")
@@ -73,9 +75,11 @@ for fileName in files:
                 searching = False
                 searchCommand = input("Please enter something to search for: ")
                 if searchCommand.startswith("m"):
-                    print("This searches for mentions")
+                    mention = input("Enter mention to search for: ")
+                    for note in compilation.with_mention(mention): print(note)
                 elif searchCommand.startswith("t"):
-                    print("This searches for topic")
+                    topic = input("Enter topic to search for: ")
+                    for note in compilation.with_topic(topic): print(note)
                 elif searchCommand.startswith("r"):
                     print("This searches for references")
                 elif searchCommand.lower().startswith("q"):
