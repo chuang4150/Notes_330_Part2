@@ -79,7 +79,7 @@ Run "UserInterface.py" and follow the prompts.
 		  Note:::: If user wants to move the note in default folder, he can just press "enter" to move note in default folder. 
 
 		r:
-	 	  By selecting this option, user will be prompted to confirm his selection by entering "y" for yes or "N" for no.		
+	 	  By selecting this option, user will be prompted to confirm his selection by entering "y" for yes or "N" for no. When the selected has been removed, the existing notes in that folder will be copied to "default" folder. So, the user will only loose the selected folder he wanted to remove, not its content.		
 	   	   Note:::: User cannot delete "default" folder. 
 		b: 
 	 	  This option will take the user back to the main menu.
@@ -96,7 +96,7 @@ The rest of the main menu options are as follows:
 
 
 
-NOTE:::: All the folders and notes will be created or mainulated in the "note_library" folder of the project.
+NOTE:::: All the folders and notes will be created and/or manipulated in the "note_library" folder of our note-taking project.
 		 
   
 	
