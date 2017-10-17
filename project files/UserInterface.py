@@ -9,8 +9,10 @@ class UserInterface:
     delete, view, or quit. If they are searching, they can search
     by mentions and topics. The program can be quit at any time.
     '''
+    #path where all notes are saved
     save_path = os.path.join(os.getcwd(),'note_library')
 
+    #find initial notes and folders in program, initialize NoteGroup
     notes=[]
     folders = []
     for root, dirs, files in os.walk(save_path, topdown = False):
@@ -22,16 +24,15 @@ class UserInterface:
                 notes.append(NoteContent(name[:-4], body))
         for name in dirs:
             folders.append(name)
-
     compilation=NoteGroup(notes)
-
+    
+    #user interaction
     running = True
     while running:
         userCommand = input("\ns: search\n"
                             "t: topological sort\n"
                             "n: navigate files\n"
                             "c: create note\n"
-                            "d: delete note\n"
                             "q: quit program\n"
                             "Please enter a command: ")
         #searching
@@ -62,69 +63,108 @@ class UserInterface:
         #navigation
         elif userCommand.lower().startswith("n"):
             nav = True
-            print("Available folders:")
+            print("\nAvailable folders:")
             for folder in folders: print(folder)
-            folder = input("\nEnter folder name: ")
-            print("Notes in " + folder + ":")
+            folder = ""
+            not_valid = folder not in folders
+            while not_valid:
+                folder = input("\nEnter folder name: ")
+                not_valid = folder not in folders
+                if not_valid:
+                    print("Please enter a valid folder name.")
+                    
+            print("\nNotes in " + folder + ":")
             available_notes = []
             curr_folder = os.path.join(save_path, folder)
             for item in os.listdir(curr_folder):
                 if item.endswith(".txt"):
                     available_notes.append(item[:-4])
             for note in available_notes: print(note)
+            print()
+            
             while nav:
-                nav_com = input("v: view\n"
-                                "e: edit\n"
-                                "d: delete\n"
-                                "m: move\n"
-                                "r: return to main menu\n"
+                nav_com = input("l: list notes\n"
+                                "v: view note\n"
+                                "e: edit note\n"
+                                "d: delete note\n"
+                                "m: move note\n"
+                                "r: remove current folder\n"
+                                "b: back to main menu\n"
                                 "Please enter a command: ")
+                #list notes
+                if nav_com.lower().startswith("l"):
+                    print("\nNotes in " + folder + ":")
+                    for note in available_notes: print(note)
+                    print()
                 #view note
-                if nav_com.lower().startswith("v"):
+                elif nav_com.lower().startswith("v"):
                     #TODO: add support for navigating references
                     note = input("Enter name of note to view: ")
                     if note in available_notes:
                         print("\nBody:")
-                        print(compilation.with_id(note).body)
-                    else: print("\nNote does not exist")
+                        print(compilation.with_id(note).body + "\n")
+                    else: print("\nNote does not exist\n")
                 #edit note
                 elif nav_com.lower().startswith("e"):
                     fileName = input("What is the name of the note you would like to edit? ")
-                    f = open(os.path.join(curr_folder, fileName) + '.txt', 'a')
-                    change = input("Add your changes:")
-                    f.write('\n' + change)
-                    f.close()
-                    print("\nNote Saved")
-                    compilation.edit_note(NoteContent(fileName, compilation.with_id(fileName).body + " " + change))
+                    if fileName in available_notes:
+                        f = open(os.path.join(curr_folder, fileName) + '.txt', 'a')
+                        change = input("Add your changes:")
+                        f.write('\n' + change)
+                        f.close()
+                        print("\nChanges Saved\n")
+                        compilation.edit_note(NoteContent(fileName, compilation.with_id(fileName).body + " " + change))
+                    else: print("\nNote does not exist\n")
                 #delete note
                 elif nav_com.lower().startswith("d"):
                     delete_note = input ("Enter the title of the note you would like to remove: ")
-                    os.remove(os.path.join(curr_folder, delete_note + ".txt"))
-                    print("\nNote Deleted")
-                    compilation.delete_note(compilation.with_id(delete_note))
+                    if delete_note in available_notes:
+                        os.remove(os.path.join(curr_folder, delete_note + ".txt"))
+                        print("\nNote Deleted")
+                        compilation.delete_note(compilation.with_id(delete_note))
+                        available_notes.remove(delete_note)
+                    else: print("\nNote does not exist\n")
                 #move note
                 elif nav_com.lower().startswith("m"):
-                    note = input("Enter note to move: ")
-                    note_folder = "default"
-                    new_folder = input("Enter folder to place note. If folder doesn't exist,\n"
-                                       "it will be created. Press enter for default folder: ")
-                    if new_folder != "": note_folder = new_folder
-                    note_path = os.path.join(save_path, note_folder)
-                    if os.path.exists(note_path) == False:
-                        os.mkdir(note_path)
-                        folders.append(new_folder)
-                        print("New folder created")
-                    os.rename(os.path.join(curr_folder, note + ".txt"),
-                              os.path.join(note_path, note + ".txt"))
+                    note = input("\nEnter note to move: ")
+                    if note in available_notes:
+                        note_folder = "default"
+                        new_folder = input("Enter folder to place note. If folder doesn't exist,\n"
+                                           "it will be created. Press enter for default folder: ")
+                        if new_folder != "": note_folder = new_folder
+                        note_path = os.path.join(save_path, note_folder)
+                        if os.path.exists(note_path) == False:
+                            os.mkdir(note_path)
+                            folders.append(new_folder)
+                            print("New folder created")
+                        os.rename(os.path.join(curr_folder, note + ".txt"),
+                                  os.path.join(note_path, note + ".txt"))
+                        print("Note has been moved.\n")
+                        available_notes.remove(note)
+                    else: print("\nNote does not exist\n")
                 elif nav_com.lower().startswith("r"):
+                    if curr_folder == os.path.join(save_path, "default"):
+                        print("\nYou may not remove the default folder.\n")
+                    else:
+                        confirm = input("\nAll notes contained in this folder will be moved to default. Confirm Y or N: ")
+                        print()
+                        if confirm.lower().startswith("y"):
+                            for note in available_notes:
+                                os.rename(os.path.join(curr_folder, note + ".txt"),
+                                          os.path.join(save_path, "default", note + ".txt"))
+                            os.rmdir(curr_folder)
+                            folders.remove(folder)
+                            nav = False
+                elif nav_com.lower().startswith("b"):
                     nav = False
                 elif nav_com.lower().startswith("q"):
                     nav = False
                     running = False
+                else:
+                    print("Please enter a valid command")
         #create note
         elif userCommand.lower().startswith("c"):
             note_folder = "default"
-
             folder_name = input("Enter name of folder to save new note in. If folder name doesn't\n"
                                 "currently exist, it will be created. Press enter for default: ")
             if folder_name != "": note_folder = folder_name
@@ -133,7 +173,6 @@ class UserInterface:
                 os.mkdir(note_path)
                 folders.append(folder_name)
                 print("New folder created")
-            
             name_of_file = ""
             not_valid = name_of_file == "" or name_of_file in compilation.ids()
             while not_valid:
@@ -143,7 +182,7 @@ class UserInterface:
                     print("Please enter a unique name for this note")
             completeName = os.path.join(note_path, name_of_file+".txt")
             file1 = open(completeName, "w")
-            toFile = input("Beginning of your note: ")
+            toFile = input("Body of your note: ")
             file1.write(toFile)
             file1.close()
             print("\nNote Created")
