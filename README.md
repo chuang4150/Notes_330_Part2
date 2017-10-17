@@ -1,5 +1,6 @@
 # Notes_330_Part2
- Our note-taking project has the ability to report notes that have selected mentions and topics. It can also sort the notes in topological order. The current version of the project has five updated features:
+ Our note-taking project has the ability to report notes that have selected mentions and topics. It can also sort the notes in topological order. The current version of the project has five updated features.
+ 
   ## Features of NoteTaking System:
   
      #1- Create and Save new notes:	
